@@ -21,6 +21,8 @@ val sizeFactor : Float = 2.9f
 val strokeFactor : Int = 90
 val foreColor : Int = Color.parseColor("#4CAF50")
 val backColor : Int = Color.parseColor("#212121")
+val sides : Int = 2
+val delay : Long = 20
 
 fun Int.inverse() : Float = 1f / this
 fun Float.maxScale(i : Int, n : Int) : Float = Math.max(0f, this - i * n.inverse())
@@ -28,7 +30,7 @@ fun Float.divideScale(i : Int, n : Int) : Float = Math.min(n.inverse(), maxScale
 fun Float.scaleFactor() : Float = Math.floor(this / scDiv).toFloat()
 fun Float.mirrorValue(a : Int, b : Int) : Float = (1 - scaleFactor()) * a.inverse() + scaleFactor() * b.inverse()
 fun Float.updateValue(dir : Float, a : Int, b : Int) : Float = mirrorValue(a, b) * dir * scGap
-fun Int.sjf() : Float = 1f - (this % 2) * 2
+fun Int.sjf() : Float = 1f - 2 * this
 
 fun Canvas.drawSWIBNode(i : Int, scale : Float, paint : Paint) {
     val w : Float = width.toFloat()
@@ -43,11 +45,13 @@ fun Canvas.drawSWIBNode(i : Int, scale : Float, paint : Paint) {
     translate(w / 2, gap * (i + 1))
     rotate(90f * sc2)
     for (j in 0..(rects - 1)) {
-        save()
-        scale(j.sjf(), 1f)
-        translate(w / 2 * sc1.divideScale(j, rects), hGap * j)
-        drawRect(RectF(0f, 0f, hGap * (j + 1), hGap), paint)
-        restore()
+        for (k in 0..(sides - 1)) {
+            save()
+            scale(k.sjf(), 1f)
+            translate(w / 2 * (1 - sc1.divideScale(j, rects)), hGap * j * k.sjf())
+            drawRect(RectF(0f, 0f, hGap * (j + 1), hGap), paint)
+            restore()
+        }
     }
     restore()
 }
@@ -96,7 +100,7 @@ class SideWiseIncreasingBarView(ctx : Context) : View(ctx) {
             if (animated) {
                 cb()
                 try {
-                    Thread.sleep(50)
+                    Thread.sleep(delay)
                     view.invalidate()
                 } catch(ex : Exception) {
 
