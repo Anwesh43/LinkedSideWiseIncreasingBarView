@@ -37,7 +37,7 @@ fun Canvas.drawSWIBNode(i : Int, scale : Float, paint : Paint) {
     val size : Float = gap / sizeFactor
     val sc1 : Float = scale.divideScale(0, 2)
     val sc2 : Float = scale.divideScale(1, 2)
-    val hGap : Float = gap / rects
+    val hGap : Float = (size) / rects
     paint.color = foreColor
     save()
     translate(w / 2, gap * (i + 1))
@@ -55,15 +55,16 @@ fun Canvas.drawSWIBNode(i : Int, scale : Float, paint : Paint) {
 class SideWiseIncreasingBarView(ctx : Context) : View(ctx) {
 
     private val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val renderer : Renderer = Renderer(this)
 
     override fun onDraw(canvas : Canvas) {
-
+        renderer.render(canvas, paint)
     }
 
     override fun onTouchEvent(event : MotionEvent) : Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-
+                renderer.handleTap()
             }
         }
         return true
@@ -202,6 +203,14 @@ class SideWiseIncreasingBarView(ctx : Context) : View(ctx) {
             swib.startUpdating {
                 animator.start()
             }
+        }
+    }
+    companion object {
+
+        fun create(activity : Activity) : SideWiseIncreasingBarView {
+            val view : SideWiseIncreasingBarView = SideWiseIncreasingBarView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
