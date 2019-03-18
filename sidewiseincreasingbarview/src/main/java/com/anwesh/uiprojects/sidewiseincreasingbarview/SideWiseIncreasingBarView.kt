@@ -182,4 +182,26 @@ class SideWiseIncreasingBarView(ctx : Context) : View(ctx) {
             curr.startUpdating(cb)
         }
     }
+
+    data class Renderer(var view : SideWiseIncreasingBarView) {
+
+        private val animator : Animator = Animator(view)
+        private val swib : SideWiseIncreasingBar = SideWiseIncreasingBar(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(backColor)
+            swib.draw(canvas, paint)
+            animator.animate {
+                swib.update {i, scl ->
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            swib.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
